@@ -12,8 +12,10 @@ track:
     class: blue
   - position: [3.286, 1.26, 0.0]
     class: blue
-  - position: [5.608152479139443, 1.585753459618739, 0.0]
-    class: blue
+  - position: [5.808152479139443, 1.585753459618739, 0.0]
+    class: big-orange
+  - position: [6.58152479139443, 1.585753459618739, 0.0]
+    class: big-orange
   - position: [7.807, 1.675, 0.0]
     class: blue
   - position: [11.643, 1.684, 0.0]
@@ -187,8 +189,10 @@ track:
     class: yellow
   - position: [3.351, -1.453, 0.0]
     class: yellow
-  - position: [5.298737169945543, -1.5470765459695015, 0.0]
-    class: yellow
+  - position: [5.798737169945543, -1.5470765459695015, 0.0]
+    class: big-orange
+  - position: [6.498737169945543, -1.5470765459695015, 0.0]
+    class: big-orange
   - position: [7.897, -1.62, 0.0]
     class: yellow
   - position: [11.778, -1.663, 0.0]

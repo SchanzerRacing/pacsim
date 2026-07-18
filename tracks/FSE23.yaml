@@ -13,9 +13,9 @@ track:
   - position: [5.03042808984456, 1.7474650661543938, 0.0]
     class: blue
   - position: [7.791714004070248, 1.4251214414027094, 0.0]
-    class: blue
+    class: big-orange
   - position: [9.777461737464256, 0.9400828816920224, 0.0]
-    class: blue
+    class: big-orange
   - position: [11.46396017103813, 0.20644971619447988, 0.0]
     class: blue
   - position: [14.228622789420754, -1.201110319044933, 0.0]
@@ -202,9 +202,9 @@ track:
   - position: [5.049054393773737, -1.7959728803950241, 0.0]
     class: yellow
   - position: [6.831708808902756, -2.2440261290276053, 0.0]
-    class: yellow
+    class: big-orange
   - position: [8.61940343445219, -2.7044464914287887, 0.0]
-    class: yellow
+    class: big-orange
   - position: [10.721547393754689, -3.2808502590007107, 0.0]
     class: yellow
   - position: [12.631145959950736, -4.562231119471902, 0.0]
