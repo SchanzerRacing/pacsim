@@ -14,8 +14,10 @@ track:
     class: blue
   - position: [5.09, 1.827, 0.0]
     class: blue
+  - position: [7.25, 1.741, 0.0]
+    class: big-orange
   - position: [8.255313378836474, 1.7205671724866967, 0.0]
-    class: blue
+    class: big-orange
   - position: [11.455, 1.462, 0.0]
     class: blue
   - position: [14.857, 1.182, 0.0]
@@ -179,8 +181,10 @@ track:
     class: yellow
   - position: [5.132, -1.872, 0.0]
     class: yellow
+  - position: [7.09, -1.957, 0.0]
+    class: big-orange
   - position: [8.09641820952108, -2.108447723809865, 0.0]
-    class: yellow
+    class: big-orange
   - position: [11.449, -2.173, 0.0]
     class: yellow
   - position: [14.939, -2.414, 0.0]
