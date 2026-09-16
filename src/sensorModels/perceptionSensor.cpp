@@ -137,9 +137,6 @@ std::vector<Landmark> PerceptionSensor::filterTypeAndDOO(std::vector<Landmark>& 
 std::vector<Landmark> PerceptionSensor::addNoise(std::vector<Landmark>& in)
 {
     std::vector<Landmark> listNew;
-    // provide numFrames as seed because the pseudo random generator would otherwise output the same values in
-    // standstill and the noise would be constant
-    std::default_random_engine generator(numFrames);
     std::normal_distribution<double> distX(errorMeanXYZ.x(), errorSigmaXYZ.x());
     std::normal_distribution<double> distY(errorMeanXYZ.y(), errorSigmaXYZ.y());
     std::normal_distribution<double> distZ(errorMeanXYZ.z(), errorSigmaXYZ.z());
@@ -176,19 +173,19 @@ std::vector<Landmark> PerceptionSensor::addNoise(std::vector<Landmark>& in)
         rotationJacobian(2, 1) = 0.0;
         rotationJacobian(2, 2) = std::cos(theta);
 
-        theta += distTheta(generator);
-        phi += distPhi(generator);
+        theta += distTheta(randomGenerator);
+        phi += distPhi(randomGenerator);
 
-        dist += dist * distRangeRelative(generator);
-        dist += distRange(generator);
+        dist += dist * distRangeRelative(randomGenerator);
+        dist += distRange(randomGenerator);
 
         lm.position.x() = dist * std::sin(theta) * std::cos(phi);
         lm.position.y() = dist * std::sin(theta) * std::sin(phi);
         lm.position.z() = dist * std::cos(theta);
 
-        lm.position.x() += distX(generator);
-        lm.position.y() += distY(generator);
-        lm.position.z() += distZ(generator);
+        lm.position.x() += distX(randomGenerator);
+        lm.position.y() += distY(randomGenerator);
+        lm.position.z() += distZ(randomGenerator);
 
         lm.cov = rotationJacobian * covSpherical * rotationJacobian.transpose();
         lm.cov(0, 0) += errorSigmaXYZ.x() * errorSigmaXYZ.x();
@@ -205,7 +202,6 @@ std::vector<Landmark> PerceptionSensor::addClassProbailities(std::vector<Landmar
     std::vector<Landmark> listNew;
     bool detect_big_orange = true;
     bool detect_timekeeping = true;
-    std::default_random_engine random_generator(this->numFrames);
     std::uniform_real_distribution<double> unif(0, 1.0);
 
     std::vector<int> detectionClasses = { LandmarkType::UNKNOWN, LandmarkType::BLUE, LandmarkType::YELLOW,
@@ -237,7 +233,7 @@ std::vector<Landmark> PerceptionSensor::addClassProbailities(std::vector<Landmar
             }
         }
         // randomly swap some class with p = prob
-        double randomNum = unif(random_generator);
+        double randomNum = unif(randomGenerator);
         double acc = 0;
         for (int i = 0; i < (LandmarkType::UNKNOWN + 1); ++i)
         {
@@ -261,7 +257,6 @@ std::vector<Landmark> PerceptionSensor::handleFalsePositivesAndNegatives(std::ve
 {
     std::vector<Landmark> listNew;
 
-    std::default_random_engine random_generator(this->numFrames);
     std::uniform_real_distribution<double> unif(0, 1.0);
 
     for (Landmark& lm : in)
@@ -271,7 +266,7 @@ std::vector<Landmark> PerceptionSensor::handleFalsePositivesAndNegatives(std::ve
             - (dist - this->minRange) * this->detection_prob_decrease_dist_linear
             - std::pow((dist - this->minRange), 2) * this->detection_prob_decrease_dist_quadratic;
         detection_prob = std::max(this->min_detection_prob, detection_prob);
-        double random = unif(random_generator);
+        double random = unif(randomGenerator);
         if (random < detection_prob)
         {
             lm.detection_probability = detection_prob;

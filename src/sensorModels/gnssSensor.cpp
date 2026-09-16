@@ -7,7 +7,6 @@ GnssSensor::GnssSensor()
     this->rate = rate;
     this->lastSampleTime = 0.0;
     this->deadTime = deadTime;
-    this->noiseSeed = 0;
 }
 
 void GnssSensor::readConfig(ConfigElement& config)
@@ -149,7 +148,6 @@ bool GnssSensor::RunTick(Eigen::Vector3d& gnssOrigin, Eigen::Vector3d& enuToTrac
 
         Eigen::Vector3d enuCar = rotMatTrackToEnu * actualTrackCar;
 
-        std::default_random_engine generator(noiseSeed);
 
         std::normal_distribution<double> distX(errorMeanPosition.x(), errorSigmaPosition.x());
         std::normal_distribution<double> distY(errorMeanPosition.y(), errorSigmaPosition.y());
@@ -163,9 +161,9 @@ bool GnssSensor::RunTick(Eigen::Vector3d& gnssOrigin, Eigen::Vector3d& enuToTrac
         std::normal_distribution<double> distYVel(errorMeanVelocity.y(), errorSigmaVelocity.y());
         std::normal_distribution<double> distZVel(errorMeanVelocity.z(), errorSigmaVelocity.z());
 
-        enuCar.x() += distX(generator);
-        enuCar.y() += distY(generator);
-        enuCar.z() += distZ(generator);
+        enuCar.x() += distX(noiseGenerator);
+        enuCar.y() += distY(noiseGenerator);
+        enuCar.z() += distZ(noiseGenerator);
         Eigen::Vector3d ecefCar = rotEnuToEcef * enuCar + ecefRef;
 
         Eigen::Vector3d positionWgs = ecefToWgs84(ecefCar.x(), ecefCar.y(), ecefCar.z());
@@ -192,7 +190,8 @@ bool GnssSensor::RunTick(Eigen::Vector3d& gnssOrigin, Eigen::Vector3d& enuToTrac
         quaternion q3 = quatMult(q2, quatMult(qCar, q0));
         // apply noise as additional rotation
         quaternion q4
-            = quatFromEulerAngles(Eigen::Vector3d(distXOr(generator), distYOr(generator), distZOr(generator)));
+            = quatFromEulerAngles(Eigen::Vector3d(
+                distXOr(noiseGenerator), distYOr(noiseGenerator), distZOr(noiseGenerator)));
         quaternion q5 = quatMult(q4, q3);
 
         quaternion outQuat = quatFromEulerAngles(Eigen::Vector3d(0.0, 0.0, 0.0));
@@ -217,9 +216,9 @@ bool GnssSensor::RunTick(Eigen::Vector3d& gnssOrigin, Eigen::Vector3d& enuToTrac
 
         if (this->outputVelocity)
         {
-            value.vel_east = velENU.x() + distXVel(generator);
-            value.vel_north = velENU.y() + distYVel(generator);
-            value.vel_up = velENU.z() + distZVel(generator);
+            value.vel_east = velENU.x() + distXVel(noiseGenerator);
+            value.vel_north = velENU.y() + distYVel(noiseGenerator);
+            value.vel_up = velENU.z() + distZVel(noiseGenerator);
             value.velocity_covariance = this->errorSigmaVelocity.asDiagonal();
             value.velocity_covariance = value.velocity_covariance.array().square();
         }
@@ -241,8 +240,6 @@ bool GnssSensor::RunTick(Eigen::Vector3d& gnssOrigin, Eigen::Vector3d& enuToTrac
 
         value.timestamp = time;
         value.frame = this->frame_id;
-
-        noiseSeed += 1;
 
         this->deadTimeQueue.push(value);
         this->registerSampling();

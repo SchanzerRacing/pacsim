@@ -28,13 +28,12 @@ bool WheelsSensor::RunTick(Wheels& in, Eigen::Vector3d& trans, Eigen::Vector3d& 
 
 Wheels WheelsSensor::applyError(Wheels input)
 {
-    std::default_random_engine generator(numFrames);
     std::normal_distribution<double> distError(error_mean, error_sigma);
 
-    input.FL += distError(generator);
-    input.FR += distError(generator);
-    input.RL += distError(generator);
-    input.RR += distError(generator);
+    input.FL += distError(randomGenerator);
+    input.FR += distError(randomGenerator);
+    input.RL += distError(randomGenerator);
+    input.RR += distError(randomGenerator);
     numFrames += 1;
     return input;
 }

@@ -101,6 +101,7 @@ std::string main_config_path;
 std::string perception_config_path;
 std::string sensors_config_path;
 std::string vehicle_model_config_path;
+int random_seed = 0;
 std::string discipline;
 std::vector<std::string> jointNames
     = { "FL_steer", "FL_rotate", "FR_steer", "FR_rotate", "RR_rotate", "RL_rotate", "steering" };
@@ -470,6 +471,8 @@ void getRos2Params(rclcpp::Node::SharedPtr& node)
 
     node->declare_parameter("realtime_ratio", rclcpp::PARAMETER_DOUBLE);
     node->get_parameter("realtime_ratio", realtimeRatio);
+    node->declare_parameter("random_seed", 0);
+    node->get_parameter("random_seed", random_seed);
 }
 
 void initPerceptionSensors()
@@ -478,10 +481,12 @@ void initPerceptionSensors()
     auto perceptionSensorsConfig = cfg.getElement("perception_sensors");
     std::vector<ConfigElement> sensors;
     perceptionSensorsConfig.getElements(&sensors);
+    unsigned int stream = 0;
     for (auto& sensor : sensors)
     {
         std::shared_ptr<PerceptionSensor> perceptionSensor = std::make_shared<PerceptionSensor>();
         perceptionSensor->readConfig(sensor);
+        perceptionSensor->setRandomSeed(random_seed, stream++);
         perceptionSensors.push_back(perceptionSensor);
     }
     return;
@@ -495,10 +500,12 @@ void initSensors()
     auto gnssConfigs = sensorsConfig.getElement("gnssSensors");
     std::vector<ConfigElement> gnssSensorConfigs;
     gnssConfigs.getElements(&gnssSensorConfigs);
+    unsigned int stream = 100;
     for (auto& sensor : gnssSensorConfigs)
     {
         std::shared_ptr<GnssSensor> gnssSensor = std::make_shared<GnssSensor>();
         gnssSensor->readConfig(sensor);
+        gnssSensor->setRandomSeed(random_seed, stream++);
         gnssSensors.push_back(gnssSensor);
     }
 
@@ -509,28 +516,35 @@ void initSensors()
     {
         std::shared_ptr<ImuSensor> imuSensor = std::make_shared<ImuSensor>(200.0, 0.002);
         imuSensor->readConfig(sensor);
+        imuSensor->setRandomSeed(random_seed, stream++);
         imus.push_back(imuSensor);
     }
     steeringSensorFront = std::make_shared<ScalarValueSensor>(200.0, 0.005);
     auto frontSteeringConfig = sensorsConfig.getElement("steering_front");
     steeringSensorFront->readConfig(frontSteeringConfig);
+    steeringSensorFront->setRandomSeed(random_seed, stream++);
     steeringSensorRear = std::make_shared<ScalarValueSensor>(200.0, 0.005);
     auto rearSteeringConfig = sensorsConfig.getElement("steering_rear");
     steeringSensorRear->readConfig(rearSteeringConfig);
+    steeringSensorRear->setRandomSeed(random_seed, stream++);
     auto wheelSpeedConfig = sensorsConfig.getElement("wheelspeeds");
     wheelspeedSensor = std::make_shared<WheelsSensor>(200.0, 0.005);
     wheelspeedSensor->readConfig(wheelSpeedConfig);
+    wheelspeedSensor->setRandomSeed(random_seed, stream++);
 
     voltageSensorTS = std::make_shared<ScalarValueSensor>(200.0, 0.005);
     auto voltageTSConfig = sensorsConfig.getElement("voltage_ts");
     voltageSensorTS->readConfig(voltageTSConfig);
+    voltageSensorTS->setRandomSeed(random_seed, stream++);
     currentSensorTS = std::make_shared<ScalarValueSensor>(200.0, 0.005);
     auto currentTSConfig = sensorsConfig.getElement("current_ts");
     currentSensorTS->readConfig(currentTSConfig);
+    currentSensorTS->setRandomSeed(random_seed, stream++);
 
     auto torquesConfig = sensorsConfig.getElement("wheelspeeds");
     torquesSensor = std::make_shared<WheelsSensor>(200.0, 0.005);
     torquesSensor->readConfig(torquesConfig);
+    torquesSensor->setRandomSeed(random_seed, stream++);
 }
 
 MainConfig fillMainConfig(std::string path)
