@@ -23,11 +23,17 @@ public:
         Eigen::Vector3d& rot, double time, Eigen::Vector3d velocity, Eigen::Vector3d omega,
         Eigen::Vector3d start_position, Eigen::Vector3d start_orientation, bool trackPreTransformed);
 
+    void setRandomSeed(int seed, unsigned int stream)
+    {
+        std::seed_seq sequence { static_cast<unsigned int>(seed), stream };
+        noiseGenerator.seed(sequence);
+    }
+
 private:
     std::string name;
     std::string frame_id;
 
-    int noiseSeed;
+    std::mt19937 noiseGenerator { 0 };
 
     Eigen::Vector3d errorSigmaPosition;
     Eigen::Vector3d errorMeanPosition;

@@ -2,6 +2,7 @@
 #define PACSIMISENSORBASE_HPP
 
 #include <queue>
+#include <random>
 
 template <typename T> class SensorBase
 {
@@ -40,6 +41,12 @@ public:
 
     Eigen::Vector3d getOrientation() { return this->orientation; }
 
+    void setRandomSeed(int seed, unsigned int stream)
+    {
+        std::seed_seq sequence { static_cast<unsigned int>(seed), stream };
+        this->randomGenerator.seed(sequence);
+    }
+
 protected:
     Eigen::Vector3d position;
     Eigen::Vector3d orientation;
@@ -49,6 +56,7 @@ protected:
     double deadTime;
     std::queue<T> deadTimeQueue;
     int numFrames;
+    std::mt19937 randomGenerator { 0 };
 };
 
 #endif /* PACSIMISENSORBASE_HPP */

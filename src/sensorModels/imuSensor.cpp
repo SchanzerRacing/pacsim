@@ -41,21 +41,20 @@ bool ImuSensor::RunTick(ImuData& in, Eigen::Vector3d& alpha, double time)
 
 ImuData ImuSensor::applyError(ImuData input)
 {
-    std::default_random_engine generator(numFrames);
     std::normal_distribution<double> distAccError(error_mean_acc, error_sigma_acc);
     std::normal_distribution<double> distRotError(error_mean_rot, error_sigma_rot);
 
-    input.acc.x() += distAccError(generator);
-    input.acc.y() += distAccError(generator);
-    input.acc.z() += distAccError(generator);
+    input.acc.x() += distAccError(randomGenerator);
+    input.acc.y() += distAccError(randomGenerator);
+    input.acc.z() += distAccError(randomGenerator);
 
     input.acc_cov(0, 0) = error_sigma_acc * error_sigma_acc;
     input.acc_cov(1, 1) = error_sigma_acc * error_sigma_acc;
     input.acc_cov(2, 2) = error_sigma_acc * error_sigma_acc;
 
-    input.rot.x() += distRotError(generator);
-    input.rot.y() += distRotError(generator);
-    input.rot.z() += distRotError(generator);
+    input.rot.x() += distRotError(randomGenerator);
+    input.rot.y() += distRotError(randomGenerator);
+    input.rot.z() += distRotError(randomGenerator);
 
     input.rot_cov(0, 0) = error_sigma_rot * error_sigma_rot;
     input.rot_cov(1, 1) = error_sigma_rot * error_sigma_rot;

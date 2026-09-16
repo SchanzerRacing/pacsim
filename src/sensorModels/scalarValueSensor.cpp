@@ -30,10 +30,9 @@ bool ScalarValueSensor::RunTick(StampedScalar& in, double time)
 
 StampedScalar ScalarValueSensor::applyError(StampedScalar input)
 {
-    std::default_random_engine generator(numFrames);
     std::normal_distribution<double> distError(error_mean, error_sigma);
 
-    input.data += distError(generator);
+    input.data += distError(randomGenerator);
     numFrames += 1;
     return input;
 }
