@@ -55,7 +55,7 @@ void gripMap::transformPoints(Eigen::Vector3d trans, Eigen::Vector3d rot)
     Eigen::Matrix3d rotationMatrix = eulerAnglesToRotMat(rot);
     Eigen::Vector3d transInverse = inverseTranslation(trans, rot);
 
-    for (int i = 0; i < this->mapPoints.size(); ++i)
+    for (std::size_t i = 0; i < this->mapPoints.size(); ++i)
     {
         this->mapPoints[i].first = rotationMatrix * this->mapPoints[i].first;
         this->mapPoints[i].first += transInverse;

@@ -114,13 +114,12 @@ public:
 
     void setSteeringSetpointFront(double in) { setSteeringFront(in); }
 
-    void setSteeringSetpointRear(double in) { return; }
+    void setSteeringSetpointRear(double) { return; }
 
     void setPowerGroundSetpoint(double in) { this->powerGroundSetpoint = std::min(std::max(in, 0.0), 1.0); }
 
     void setSteeringFront(double in)
     {
-        double avgRatio = 0.5 * (this->innerSteeringRatio + this->outerSteeringRatio);
         if (in > 0)
         {
             this->steeringAngles.FL = this->innerSteeringRatio * in;
@@ -143,14 +142,10 @@ public:
     }
 
     // ax, ay, rdot
-    Eigen::Vector3d getDynamicStates(double dt, Wheels frictionCoefficients)
+    Eigen::Vector3d getDynamicStates(double, Wheels frictionCoefficients)
     {
         double l = this->lr + this->lf;
         double vx = this->velocity.x();
-        double vy = this->velocity.y();
-        double ax = this->acceleration.x();
-        double ay = this->acceleration.y();
-        double r = this->angularVelocity.z();
         // Downforce
         double F_aero_downforce
             = 0.5 * 1.29 * this->aeroArea * this->cla * (vx * vx) + this->powerGroundSetpoint * this->powerGroundForce;

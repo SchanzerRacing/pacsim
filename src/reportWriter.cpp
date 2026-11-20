@@ -66,7 +66,7 @@ bool reportToFile(Report report, std::string dir)
 
     out << YAML::Key << "laps";
     out << YAML::BeginSeq;
-    for (int i = 0; i < report.lap_times.size(); ++i)
+    for (std::size_t i = 0; i < report.lap_times.size(); ++i)
     {
         out << YAML::BeginMap;
         out << YAML::Key << "lap";
@@ -75,7 +75,7 @@ bool reportToFile(Report report, std::string dir)
         out << YAML::Value << report.lap_times[i].time;
         out << YAML::Key << "sectors";
         out << YAML::Flow << YAML::BeginSeq;
-        for (int j = 0; j < report.lap_times[i].sector_times.size(); ++j)
+        for (std::size_t j = 0; j < report.lap_times[i].sector_times.size(); ++j)
         {
             out << report.lap_times[i].sector_times[j];
         }
@@ -87,7 +87,7 @@ bool reportToFile(Report report, std::string dir)
 
     out << YAML::Key << "penalties";
     out << YAML::BeginSeq;
-    for (int i = 0; i < report.penalties.size(); ++i)
+    for (std::size_t i = 0; i < report.penalties.size(); ++i)
     {
         out << YAML::BeginMap;
         out << YAML::Key << "penalty";

@@ -48,7 +48,7 @@ void addTimeKeepings(std::vector<std::pair<Landmark, Landmark>>* _ret, Node* lis
         lm.typeWeights[lm.type] = 1.0;
         lms.push_back(lm);
     }
-    for (int i = 0; i < (lms.size() / 2); ++i)
+    for (std::size_t i = 0; i < (lms.size() / 2); ++i)
     {
         _ret->push_back(std::make_pair(lms[i * 2], lms[i * 2 + 1]));
     }

@@ -95,7 +95,7 @@ visualization_msgs::msg::MarkerArray LandmarksMarkerWrapper::markerFromLMs(Track
         }
     }
     // draw lines timekeeping
-    for (int i = 0; i < in.time_keeping_gates.size(); ++i)
+    for (std::size_t i = 0; i < in.time_keeping_gates.size(); ++i)
     {
         auto line = in.time_keeping_gates[i];
         visualization_msgs::msg::Marker marker;

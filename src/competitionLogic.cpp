@@ -180,7 +180,7 @@ std::vector<bool> CompetitionLogic::pointsInTrackConnected(Track& track, std::ve
     for (Eigen::Vector2d& point : points)
     {
         bool inTrack = false;
-        for (int i = 0; i < triPoints.size(); ++i)
+        for (std::size_t i = 0; i < triPoints.size(); ++i)
         {
             inTrack = inTrack
                 || pointInTriangle(triPoints.at(i).at(0), triPoints.at(i).at(1), triPoints.at(i).at(2), point);
@@ -223,7 +223,6 @@ std::pair<bool, bool> CompetitionLogic::rayIntersectLineSegment(
         {
             return std::make_pair(false, false);
         }
-        double x = 1;
     }
     // not parallel but no intersect
     else
@@ -250,7 +249,7 @@ bool CompetitionLogic::pointInPolygon(std::vector<Eigen::Vector2d> polyPoints, E
         }
         iters += 1;
         Eigen::Vector2d rayDirection(std::cos(rayAngle), std::sin(rayAngle));
-        for (int i = 1; i < polyPoints.size(); ++i)
+        for (std::size_t i = 1; i < polyPoints.size(); ++i)
         {
             std::pair<bool, bool> intersectRes
                 = rayIntersectLineSegment(polyPoints[i - 1], polyPoints[i], point, Eigen::Vector2d(1, 0));
@@ -349,11 +348,11 @@ bool CompetitionLogic::carConePolyIntersect(std::vector<Eigen::Vector2d> carPoly
     // check
     bool result = false;
     // dont need to check last point because it's equal to first one
-    for (int i = 0; i < (conePoly.size() - 1); ++i)
+    for (std::size_t i = 0; i + 1 < conePoly.size(); ++i)
     {
         result = result || pointInPolygon(carPoly, conePoly.at(i));
     }
-    for (int i = 0; i < (carPoly.size() - 1); ++i)
+    for (std::size_t i = 0; i + 1 < carPoly.size(); ++i)
     {
         result = result || pointInPolygon(conePoly, carPoly.at(i));
     }
@@ -378,25 +377,24 @@ void CompetitionLogic::evaluateConeHit(
     Eigen::Vector2d rr = position.head(2) + rotM * rrLocal;
     std::vector<Eigen::Vector2d> pointsToBeChecked { fl, fr, rr, rl, fl };
 
-    double coneCheckDist = 5.0;
     double coneWidth = 0.228;
     std::vector<Landmark*> closeCones;
     double closeThresh = 5.0;
-    for (int i = 0; i < track.left_lane.size(); ++i)
+    for (std::size_t i = 0; i < track.left_lane.size(); ++i)
     {
         if ((position.head(2) - track.left_lane.at(i).position.head(2)).norm() <= closeThresh)
         {
             closeCones.push_back(&track.left_lane.at(i));
         }
     }
-    for (int i = 0; i < track.right_lane.size(); ++i)
+    for (std::size_t i = 0; i < track.right_lane.size(); ++i)
     {
         if ((position.head(2) - track.right_lane.at(i).position.head(2)).norm() <= closeThresh)
         {
             closeCones.push_back(&track.right_lane.at(i));
         }
     }
-    for (int i = 0; i < track.unknown.size(); ++i)
+    for (std::size_t i = 0; i < track.unknown.size(); ++i)
     {
         if ((position.head(2) - track.unknown.at(i).position.head(2)).norm() <= closeThresh)
         {
@@ -404,7 +402,7 @@ void CompetitionLogic::evaluateConeHit(
         }
     }
 
-    for (int i = 0; i < closeCones.size(); ++i)
+    for (std::size_t i = 0; i < closeCones.size(); ++i)
     {
         Eigen::Vector2d conePos = closeCones.at(i)->position.head(2);
         Eigen::Vector2d p1 = conePos + Eigen::Vector2d(coneWidth * 0.5, coneWidth * 0.5);
@@ -453,7 +451,7 @@ bool CompetitionLogic::inLineSegement(Eigen::Vector2d a, Eigen::Vector2d b, Eige
 }
 
 int CompetitionLogic::timeKeepingStatus(
-    Eigen::Vector3d lm1, Eigen::Vector3d lm2, Eigen::Vector3d& position, Eigen::Vector3d& orientation)
+    Eigen::Vector3d lm1, Eigen::Vector3d lm2, Eigen::Vector3d& position, Eigen::Vector3d&)
 {
     Eigen::Vector2d transponderPosition = position.head(2);
     int ret = 0;
@@ -498,7 +496,6 @@ void CompetitionLogic::evaluateTimeKeepingGateTrigger(Track track, double time, 
     // sector time
     else
     {
-        double sectorTime = time - lastTriggerTime;
         currentSectorTimes.push_back(time);
     }
     triggerTimes[i].push_back(time);
@@ -508,7 +505,7 @@ void CompetitionLogic::evaluateTimeKeepingGateTrigger(Track track, double time, 
 void CompetitionLogic::evaluateTimeKeepings(
     Track& track, Eigen::Vector3d& position, Eigen::Vector3d& orientation, double time)
 {
-    for (int i = 0; i < track.time_keeping_gates.size(); ++i)
+    for (std::size_t i = 0; i < track.time_keeping_gates.size(); ++i)
     {
         int res = this->timeKeepingStatus(track.time_keeping_gates[i].first.position,
             track.time_keeping_gates[i].second.position, position, orientation);
@@ -840,19 +837,19 @@ void CompetitionLogic::fillReport(Report& report, double time)
         report.final_time_raw = 0.5 * (lapTimes.at(1) + lapTimes.at(3));
     }
     report.final_time = report.final_time_raw;
-    for (int i = 0; i < lapTimes.size(); ++i)
+    for (std::size_t i = 0; i < lapTimes.size(); ++i)
     {
         Report::LapTime time;
         time.time = lapTimes[i];
         std::vector<double> sectors;
-        for (int j = 0; j < sectorTimes[i].size(); ++j)
+        for (std::size_t j = 0; j < sectorTimes[i].size(); ++j)
         {
             sectors.push_back(sectorTimes[i][j]);
         }
         time.sector_times = sectors;
         report.lap_times.push_back(time);
     }
-    for (int i = 0; i < penalties.size(); ++i)
+    for (std::size_t i = 0; i < penalties.size(); ++i)
     {
         Report::Penalty p;
         p.lap = penalties[i].lap;

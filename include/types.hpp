@@ -77,7 +77,7 @@ struct Wheels
     double RL;
     double RR;
 
-    double timestamp;
+    double timestamp = 0.0;
 };
 
 struct ImuData
