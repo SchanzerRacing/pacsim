@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.16)
 project(pacsim)
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 20)
 endif()
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -18,6 +18,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(rosgraph_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
@@ -50,22 +51,25 @@ file(GLOB_RECURSE pacsim_SRCS
 
 
 add_executable(${PROJECT_NAME}_node ${pacsim_SRCS})
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp std_srvs visualization_msgs geometry_msgs tf2_ros yaml-cpp)
+rosidl_get_typesupport_target(cpp_typesupport_target
+  ${PROJECT_NAME} rosidl_typesupport_cpp)
+target_link_libraries(${PROJECT_NAME}_node PRIVATE
+  "${cpp_typesupport_target}"
+  ${geometry_msgs_TARGETS}
+  ${rosgraph_msgs_TARGETS}
+  ${sensor_msgs_TARGETS}
+  ${std_srvs_TARGETS}
+  ${visualization_msgs_TARGETS}
+  Eigen3::Eigen
+  rclcpp::rclcpp
+  tf2_ros::tf2_ros
+  yaml-cpp::yaml-cpp)
 ament_export_dependencies(std_msgs geometry_msgs rosidl_default_runtime)
-
-rosidl_target_interfaces(${PROJECT_NAME}_node
-  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 target_include_directories(${PROJECT_NAME}_node PUBLIC
 ${EIGEN3_INCLUDE_DIRS}
 "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 "$<INSTALL_INTERFACE:include>")
-
-target_link_libraries(
-  ${PROJECT_NAME}_node 
-  ${YAML_CPP_LIBRARIES}
-  )
-
 
 install(TARGETS
   ${PROJECT_NAME}_node
